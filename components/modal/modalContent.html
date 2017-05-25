@@ -1,0 +1,211 @@
+<style>
+        .modal-lg{
+            width:95%;
+        }
+        .invoice-modal-full {
+            width:98% !important;
+            border:1px solid #222;
+            border-radius:3px;
+        }
+        .invoice-header, .invoice-margin{
+            margin-top:5px;
+            margin-bottom:5px;
+        }
+        .invoice-panel-padding{
+            padding:5px !important;
+        }
+        .no-border {
+            border:0px !important;
+        }
+        .no-border tr, .no-border td{
+            border:none !important;
+        }
+        .table-bordered>thead>tr>th, .table-bordered>thead>tr>td{
+            border-bottom:0px;
+        }
+    </style>
+<div class="modal-header">
+    <h3 class="modal-title">Sales Confirmation</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+</div>
+<div class="modal-body">
+<div class="container invoice-modal-full" id="invoice-modal-full-123">
+    <div class="row">
+        <div class="col-md-2">
+            <img src="static/images/logo.png" style="width:110px"/>
+        </div>
+        <div class="col-md-8">
+        	<div class="invoice-title text-center">
+    			<h3 class="invoice-header">TAX INVOICE</h3>
+    			<h2 class="invoice-header">CAMERA EMPORIUM</h2>
+    		</div>
+    	</div>
+        <div class="col-md-2"></div>
+    </div>
+    
+    
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel panel-default invoice-header">
+                <div class="panel-body text-center invoice-panel-padding">
+                    <H4 class="invoice-header">SALES AND REPAIR FOR HANDYCAM AND DIGITAL CAMERA</H4>
+                </div>
+            </div>
+        </div>
+    </div>     
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            <address>
+                <h5>
+                Shop No. 8, Kedar Empire, Near Paud Phata, Opp SNDT College, Karve Road, Pune, Maharashtra 411038 <br>
+                Ph: 020-25451046, Mob:09921-008-559, E-mail: cameraemporium@gmail.com, info@cameraemporium.com
+                <h5>
+            </address>
+        </div>
+    </div>     
+
+    <div class="row">
+        <div class="col-xs-12">
+            <table class="table table-condensed no-border invoice-margin">
+                <tr>
+                    <td class="col-xs-2"><span class="pull-left">Invoice</span> <span class="pull-right">:</span></td>
+                    <td class="col-xs-2">&nbsp; 12/12/12/12</td>
+                    <td class="col-xs-4"></td>
+                    <td class="col-xs-2"><span class="pull-right">Date</span></td>
+                    <td class="col-xs-2"><span class="pull-left">:</span>&nbsp; <span>12/06/2017</span></td>
+                </tr>
+                <tr>
+                    <td class="col-xs-2"><span class="pull-left">Customer</span> <span class="pull-right">:</span></td>
+                    <td class="col-xs-2">&nbsp; Aniket</td>
+                    <td class="col-xs-4"></td>
+                    <td class="col-xs-2"><span class="pull-right">Mobile No.</span></td>
+                    <td class="col-xs-2"><span class="pull-left">:</span>&nbsp; <span>9923-70-20-85</span></td>
+                </tr>
+                <tr>
+                    <td class="col-xs-2"><span class="pull-left">Address</span> <span class="pull-right">:</span></td>
+                    <td class="col-xs-10" colspan="4">&nbsp; flat no-8, sri ganesh residency, azadwadi pune</td>
+                </tr>
+            </table>
+        </div>
+    </div>     
+
+    <div class="row">
+    	<div class="col-md-12">
+
+           <table st-table="selectedProducts" class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Particulars</th>
+                <th>serial No</th>
+                <th>Qty</th>
+                <th>Price per Unit</th>
+                <th>Rate</th>
+                <th>Tax Type</th>
+                <th>Tax Amount</th>
+                <th>Total Amount</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="row in selectedProducts">
+                <td>{{row.name}}</td>
+                <td>{{row.sn}}</td>
+                <td><span class="pull-right">{{row.quantity}}</span></td>
+                <td><span class="pull-right">{{row.price.toFixed(2)}}</span></td>
+                <td><span class="pull-right">{{row.totalPrice.toFixed(2)}}</span></td>
+                <td><span class="pull-right">{{row.taxType}} ({{row.taxValue}}%)</span></td>
+                <td><span class="pull-right">{{row.taxAmmount.toFixed(2)}}</span></td>
+                <td><span class="pull-right">{{row.grandTotal.toFixed(2)}}</span></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th><span class="pull-right">{{productTotal.totalPrice.toFixed(2)}}</span></th>
+                <th></th>
+                <th><span class="pull-right">{{productTotal.taxAmmount.toFixed(2)}}</span></th>
+                <th><span class="pull-right">{{productTotal.grandTotal.toFixed(2)}}</span></th>
+            </tr>
+            </tfoot>
+        </table>
+
+
+    	</div>
+    </div>
+    
+    <div class="row">
+        <div class="col-xs-12">
+            <table class="table table-condensed no-border invoice-margin">
+                <tr>
+                    <td class="col-xs-2"><span class="pull-left">VAT Tin No.</span> <span class="pull-right">:</span></td>
+                    <td class="col-xs-2">&nbsp; 27630393955V</td>
+                    <td class="col-xs-8"></td>
+                </tr>
+            </table>
+            <table class="table table-condensed no-border invoice-margin" ng-if="paymentInfo.paymentType == 'cash'">
+                <tr>
+                    <td class="col-xs-2"><span class="pull-left">Payment Mode</span> <span class="pull-right">:</span></td>
+                    <td class="col-xs-2">&nbsp; CASH</td>
+                    <td class="col-xs-8"></td>
+                </tr>
+            </table>
+            <table class="table table-condensed no-border invoice-margin" ng-if="paymentInfo.paymentType == 'cheq'">
+                <tr>
+                    <td class="col-xs-2"><span class="pull-left">Payment Mode.</span> <span class="pull-right">:</span></td>
+                    <td class="col-xs-2">&nbsp; CHEQUE</td>
+                    <td class="col-xs-4"></td>
+                    <td class="col-xs-2"><span class="pull-right">Cheque No</span></td>
+                    <td class="col-xs-2"><span class="pull-left">:</span>&nbsp; <span>123456789</span></td>
+                </tr>
+                <tr>
+                    <td class="col-xs-2"><span class="pull-left">Bank</span> <span class="pull-right">:</span></td>
+                    <td class="col-xs-2">&nbsp; SBI</td>
+                    <td class="col-xs-4"></td>
+                    <td class="col-xs-2"><span class="pull-right">Cheque Date.</span></td>
+                    <td class="col-xs-2"><span class="pull-left">:</span>&nbsp; <span>12/16/85</span></td>
+                </tr>
+            </table>
+            <table class="table table-condensed no-border invoice-margin" ng-if="paymentInfo.paymentType == 'card'">
+                <tr>
+                    <td class="col-xs-2"><span class="pull-left">Payment Mode.</span> <span class="pull-right">:</span></td>
+                    <td class="col-xs-2">&nbsp; CARD</td>
+                    <td class="col-xs-4"></td>
+                    <td class="col-xs-2"><span class="pull-right">Card no.</span></td>
+                    <td class="col-xs-2"><span class="pull-left">:</span>&nbsp; <span>123456789</span></td>
+                </tr>
+                <tr>
+                    <td class="col-xs-2"><span class="pull-left">Bank</span> <span class="pull-right">:</span></td>
+                    <td class="col-xs-2">&nbsp; SBI</td>
+                    <td class="col-xs-4"></td>
+                    <td class="col-xs-2"><span class="pull-right">Cheque Date.</span></td>
+                    <td class="col-xs-2"><span class="pull-left">:</span>&nbsp; <span>12/16/85</span></td>
+                </tr>
+            </table>
+        </div>
+    
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div>
+                <table class="table table-bordered">
+                    <tr>
+                        <td id="td-terms-contents" style="width:50%">"I/We" hereby certify that my/our registration certificate  under the Maharashtra Value Added Tax Act, 2002 is in force on the date on which the sale of the goods specified in this tax invoice is made by me/us and that the transaction of sale covered by this tax invoice has been effected by me/us and it shall be accounted for in the turnover of sales while filing of return  and the due tax, if any, payable on the sale has been paid or shall be paid</td>
+                        <td id="td-signature-contents" style="width:50%">
+                             <div style="text-align:center">(Authorised Signature)</div>
+                        
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="printPage();">Print</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>
