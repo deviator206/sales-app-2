@@ -44,6 +44,7 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
     $scope.salesDate = new Date();
     $scope.dateOptions = {};
     $scope.selectedProducts = [];
+    $scope.salesResponseData = [];
     $scope.taxTypes = [
         {name: "VAT-1", value: "13.5"},
         {name: "VAT-2", value: "5.5"},
@@ -51,6 +52,8 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
         {name: "Service Tax", value: "13.5"},
         {name: "NONE", value: "0"}
     ];
+    
+    $scope.taxTypeTotal = {};
     
     var setInitialValuforTotals = function(){
         return {
@@ -67,6 +70,7 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
       var hour = "" + now.getHours(); if (hour.length == 1) { hour = "0" + hour; }
       var minute = "" + now.getMinutes(); if (minute.length == 1) { minute = "0" + minute; }
       var second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
+      $scope.dateValue = day + "-" + month + "-" + year + " (" + hour + ":" + minute + ":" + second  + ")";
       return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
     }    
     
@@ -75,22 +79,43 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
         return $scope.curentProduct;
     };
     
+    var toDecimalPrecision = function(amount, decimalPosition){
+        if(decimalPosition == undefined || isNaN(decimalPosition)){
+            decimalPosition = 2;
+        }
+        if(amount){
+            amount = parseFloat(amount,10);
+            amount = amount.toFixed(decimalPosition);
+            amount = parseFloat(amount,10);
+        }else{
+            debugger;    
+        }
+        
+        return amount;
+    }
+    
     var calculateTotal = function(){
         var selProLen = $scope.selectedProducts.length;
+        $scope.productTotal = setInitialValuforTotals();
         if(selProLen > 0){
             for(var i=0; i<selProLen; i++){
-                $scope.productTotal.taxAmmount += $scope.selectedProducts[i].taxAmmount;
-                $scope.productTotal.totalPrice += $scope.selectedProducts[i].totalPrice;
-                $scope.productTotal.grandTotal += $scope.selectedProducts[i].grandTotal;
-                $scope.productTotal.totalItems += $scope.selectedProducts[i].quantity;
+                $scope.productTotal.taxAmmount += toDecimalPrecision($scope.selectedProducts[i].taxAmmount);
+                $scope.productTotal.totalPrice += toDecimalPrecision($scope.selectedProducts[i].totalPrice);
+                $scope.productTotal.grandTotal += toDecimalPrecision($scope.selectedProducts[i].grandTotal);
+                $scope.productTotal.totalItems += toDecimalPrecision($scope.selectedProducts[i].quantity);
             }
-        }else{
-            $scope.productTotal = setInitialValuforTotals();
         }
+
+        $scope.productTotal.taxAmmount = toDecimalPrecision($scope.productTotal.taxAmmount, 2);
+        $scope.productTotal.totalPrice = toDecimalPrecision($scope.productTotal.totalPrice, 2);
+        $scope.productTotal.grandTotal = toDecimalPrecision($scope.productTotal.grandTotal, 2);
+        $scope.productTotal.totalItems = toDecimalPrecision($scope.productTotal.totalItems, 2);
+
         
         $scope.paymentInfo.cash.amount = $scope.productTotal.grandTotal;
         $scope.paymentInfo.cheq.amount = $scope.productTotal.grandTotal;
         $scope.paymentInfo.card.amount = $scope.productTotal.grandTotal;
+        
     };
 
     var getItemScopeMappedValue = function(type){
@@ -135,7 +160,10 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
             data : payload
         }).then(function mySuccess(response) {
             console.log(response.data);
-           // $scope.myWelcome = response.data;
+            $scope.salesResponseData = response.data;
+            console.log($scope.salesResponseData);
+            console.log($scope.customerDetails);
+            $scope.open();
         }, function myError(response) {
             //$scope.myWelcome = response.statusText;
         });        
@@ -186,7 +214,7 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
         $scope.curentProduct.name = value.name || '';
         $scope.curentProduct.model = value.model || '';
         $scope.curentProduct.sn = value.sn || '';
-        $scope.curentProduct.price = value.price || null;
+        $scope.curentProduct.price = parseFloat(value.price, 10) || null;
         $scope.curentProduct.taxType = value.taxType || '';
         $scope.curentProduct.taxRate = parseFloat(value.taxRate, 10) || 0;
         $scope.curentProduct.quantity = 1;
@@ -202,9 +230,6 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
             productInfo:angular.copy($scope.selectedProducts)
         };
         salesAjaxCall(payLoad);
-        console.log(payLoad);
-        console.log(JSON.stringify(payLoad));
-        //$scope.open();
     };
 
     $scope.onTaxChange = function(){
@@ -215,17 +240,18 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
         
         $scope.curentProduct.quantity = parseInt($scope.curentProduct.quantity, 10);
         if(!isNaN($scope.curentProduct.quantity) && !isNaN($scope.curentProduct.price)){
-            $scope.curentProduct.totalPrice = $scope.curentProduct.quantity * $scope.curentProduct.price;
+            $scope.curentProduct.totalPrice = toDecimalPrecision($scope.curentProduct.quantity * $scope.curentProduct.price);
         }
         if(!isNaN($scope.curentProduct.totalPrice) && !isNaN($scope.curentProduct.taxValue)){
-            $scope.curentProduct.taxAmmount = ($scope.curentProduct.totalPrice * $scope.curentProduct.taxValue)/100;
+            $scope.curentProduct.taxAmmount = toDecimalPrecision(($scope.curentProduct.totalPrice * $scope.curentProduct.taxValue)/100);
         }
         if(!isNaN($scope.curentProduct.taxAmmount)){
-            $scope.curentProduct.grandTotal = $scope.curentProduct.taxAmmount + $scope.curentProduct.totalPrice;
+            $scope.curentProduct.grandTotal = toDecimalPrecision($scope.curentProduct.taxAmmount + $scope.curentProduct.totalPrice);
         }
         $scope.selectedProducts.push($scope.curentProduct);  
-        setCurrentProductBlank();
         calculateTotal();
+        $scope.taxTypeTotal = calculateTaxTypeTotal();
+        setCurrentProductBlank();
     }
 
     $scope.removeRow = function removeRow(row) {
@@ -233,12 +259,22 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
         if (index !== -1) {
             $scope.selectedProducts.splice(index, 1);
         }
+        $scope.taxTypeTotal = calculateTaxTypeTotal();
         calculateTotal();
     }
     
-    $scope.onPaymentTypeChnage = function(){
-        
-        
+    var calculateTaxTypeTotal = function(){
+        var taxTypes = {},  taxType = '', taxTypeSum = 0;
+        console.log($scope.selectedProducts);
+        for(var i=0; i<$scope.selectedProducts.length; i++){
+            taxType = $scope.selectedProducts[i].taxType;
+           if(taxTypes[taxType] === undefined){
+               taxTypes[taxType] = {taxType:taxType, taxRate:$scope.selectedProducts[i].taxRate, taxAmmount:$scope.selectedProducts[i].taxAmmount || 0};
+           }else{
+               taxTypes[taxType].taxAmmount += $scope.selectedProducts[i].taxAmmount;
+           }
+        }
+        return taxTypes;
     }
     
     $scope.printPage = function(){
@@ -247,10 +283,15 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
         popupWin.window.onload = function() {
             popupWin.document.getElementById("masterContent").innerHTML = printContents;
             popupWin.window.print();
-            popupWin.window.close();   
+            popupWin.window.close();  
+            //$scope.reloadSalesPage();
         }        
     }
-
+    
+    $scope.reloadSalesPage = function(){
+        window.location.href = "index.html";
+    }
+    
     $scope.open = function (size) {
         var modalInstance;
         var modalScope = $scope.$new();
