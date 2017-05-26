@@ -99,6 +99,7 @@
            <table st-table="selectedProducts" class="table table-bordered">
             <thead>
             <tr>
+                <th>S.No.</th>
                 <th>Particulars</th>
                 <th>serial No</th>
                 <th>Qty</th>
@@ -111,6 +112,7 @@
             </thead>
             <tbody>
             <tr ng-repeat="row in selectedProducts">
+                <th>{{$index+1}}</th>
                 <td>{{row.name}}</td>
                 <td>{{row.sn}}</td>
                 <td><span class="pull-right">{{row.quantity}}</span></td>
@@ -123,6 +125,7 @@
             </tbody>
             <tfoot>
             <tr>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
