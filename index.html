@@ -18,7 +18,15 @@
         .modal-lg{
             width:95%;
         }
+        .a{
+        }
     </style>
+    <script>
+        function openInNewTab(url) {
+          var win = window.open(url, '_blank');
+          win.focus();
+        }    
+     </script>
 </head>
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -32,6 +40,9 @@
                     <li><a href="#!/report">Report</a></li>
                     <li><a href="#!/view1">view1</a></li>
                 </ul>
+                <ul class="nav navbar-nav navbar-right">
+                      <li style="margin-top:5px;"><button onclick="openInNewTab('index.html')" class="btn btn-success" type="submit">Start New Sale</button></li>
+                </ul>                
             </div>
         </div>
     </nav>
