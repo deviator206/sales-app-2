@@ -40,9 +40,12 @@
                     typeahead-on-select="selectCustomerFrmList($item)"
                     typeahead-min-length="3"
                     id="cust-name"
+                    name="customerName"
                     autocomplete="off"
                     autofocus
+                    required
                     />    
+                <span class="errMsg" ng-show="salesForm.customerName.$touched && salesForm.customerName.$error.required">Enter Customer Name</span>                
                 </div>
             </div>
         </div>
@@ -101,9 +104,11 @@
             typeahead-on-select="selectProductFrmList($item, 'NAME')"
             typeahead-min-length="3" ng-enter="addProduct()" 
             id="current-product-name"
+            name="currentProductName"
             autocomplete="off"
+            required
             />    
-            
+            <span class="errMsg" ng-show="salesForm.currentProductName.$touched && salesForm.currentProductName.$error.required">Enter Product name.</span>
         </div>
       </div>
       <div class="form-group col-sm-2 ">
@@ -117,9 +122,9 @@
             typeahead-on-select="selectProductFrmList($item, 'MODEL')"
             typeahead-min-length="3"  ng-enter="addProduct()" 
             id="current-product-model-number"
+            name="currentProductModelNumber"
             autocomplete="off"
             />    
-        
        </div> 
       </div>
       <div class="form-group col-sm-2 ">
@@ -133,6 +138,7 @@
             typeahead-on-select="selectProductFrmList($item, 'SN')"
             typeahead-min-length="3" ng-enter="addProduct()" 
             id="current-product-serial-number"
+            name="currentProductSerialNumber"
             autocomplete="off"
             />    
 
@@ -141,13 +147,17 @@
       <div class="form-group col-sm-1 ">
       <div class="col-sm-12">
         <label for="current-product-quantity">Quantity</label>
-            <input autocomplete="off" type="text" class="form-control" ng-model="curentProduct.quantity" id="current-product-quantity" placeholder="Item Quantity" ng-enter="addProduct()"  />
+            <input autocomplete="off" type="number" class="form-control" ng-model="curentProduct.quantity" id="current-product-quantity" placeholder="Item Quantity" ng-enter="addProduct()"  required type="number" name="currentProductQuantity" />
+        <span class="errMsg" ng-show="salesForm.currentProductQuantity.$touched && salesForm.currentProductQuantity.$error.required">Enter Qty</span>                
+        
       </div>  
       </div>
       <div class="form-group col-sm-2 ">
       <div class="form-group col-sm-12">
         <label for="current-product-price">Price</label>
-            <input autocomplete="off" type="text" class="form-control" id="current-product-price" ng-model="curentProduct.price" placeholder="Quantity" ng-enter="addProduct()"  />
+            <input autocomplete="off" type="number" class="form-control" id="current-product-price" ng-model="curentProduct.price" placeholder="Quantity" 
+            ng-enter="addProduct()"  name="currentProductPrice" required />
+            <span class="errMsg" ng-show="salesForm.currentProductPrice.$touched && salesForm.currentProductPrice.$error.required">Enter prices</span>            
        </div> 
       </div>
       <div class="form-group col-sm-2 ">
@@ -161,7 +171,8 @@
       <div class="form-group col-sm-1 ">
       <div class="col-sm-12">
         <label for="current-product-add">.</label>
-            <button id="current-product-add" type="button" class="form-control btn btn-sm btn-info" ng-click="addProduct()">Add</button>
+            <button  ng-disabled="!isValidProductInfoforAdd()" id="current-product-add" type="button" 
+            class="form-control btn btn-sm btn-info" ng-click="addProduct()">Add</button>
       </div>  
       </div>
     </div> 
@@ -331,8 +342,11 @@
 
 <fieldset class="sales-operation-section" ng-if="selectedProducts.length > 0">
     <!--<legend class="sales-operation-section">Final Step</legend>-->
+    {{isValidCustomerAdd()}} -- {{!isValidCustomerAdd()}} -- 
     <div class="form-group" style="width:95%; margin:0 auto">
-        <button type="submit" class="btn btn-block btn-success" ng-click='performSalesOperation()'>Submit</button>
+        <button type="submit" class="btn btn-block btn-success" 
+        ng-disabled="!isValidCustomerAdd()"
+        ng-click='performSalesOperation()'>Submit</button>
     </div>    
 </fieldset>
 

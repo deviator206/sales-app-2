@@ -248,10 +248,42 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
         if(!isNaN($scope.curentProduct.taxAmmount)){
             $scope.curentProduct.grandTotal = toDecimalPrecision($scope.curentProduct.taxAmmount + $scope.curentProduct.totalPrice);
         }
-        $scope.selectedProducts.push($scope.curentProduct);  
-        calculateTotal();
-        $scope.taxTypeTotal = calculateTaxTypeTotal();
-        setCurrentProductBlank();
+        if($scope.isValidProductInfoforAdd()){
+            $scope.selectedProducts.push($scope.curentProduct);  
+            calculateTotal();
+            $scope.taxTypeTotal = calculateTaxTypeTotal();
+            setCurrentProductBlank();
+            $scope.setProductContainerToPristine();
+        }
+    };
+    
+    $scope.setProductContainerToPristine = function(){
+        $scope.salesForm.currentProductName.$setUntouched();
+        $scope.salesForm.currentProductModelNumber.$setUntouched();
+        $scope.salesForm.currentProductSerialNumber.$setUntouched();
+        $scope.salesForm.currentProductQuantity.$setUntouched();
+        $scope.salesForm.currentProductPrice.$setUntouched();
+
+        $scope.salesForm.currentProductName.$setPristine();
+        $scope.salesForm.currentProductModelNumber.$setPristine();
+        $scope.salesForm.currentProductSerialNumber.$setPristine();
+        $scope.salesForm.currentProductQuantity.$setPristine();
+        $scope.salesForm.currentProductPrice.$setPristine();
+    }
+    
+    $scope.isValidProductInfoforAdd = function(){
+        var allowAddProduct = false;
+        if(!$scope.salesForm.currentProductName.$invalid && !$scope.salesForm.currentProductQuantity.$invalid && !$scope.salesForm.currentProductPrice.$invalid){
+            allowAddProduct = true;
+        }
+        return allowAddProduct;
+    }
+    $scope.isValidCustomerAdd = function(){
+        var isValidCustomerForm = false;
+        if(!$scope.salesForm.customerName.$invalid){
+            isValidCustomerForm = true;
+        }
+        return isValidCustomerForm;
     }
 
     $scope.removeRow = function removeRow(row) {
