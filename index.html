@@ -42,19 +42,43 @@
           var win = window.open(url, '_blank');
           win.focus();
         }    
+        window.onhashchange = function () {
+            var winHash = window.location.hash;
+			var activeElem = document.getElementsByClassName("top-menu");
+			console.log(activeElem);
+			if(activeElem.length >0 ){
+				for(var i=0; i<activeElem.length; i++){
+					activeElem[i].classList.remove('active');				
+				}
+			}
+			
+			
+			console.log(winHash);
+			switch(winHash){
+			case "#!/sales":
+				document.getElementById('sales-top-menu').classList.add('active');
+			break;
+
+			case "#!/repair":
+				document.getElementById('repair-top-menu').classList.add('active');
+			break;
+			case "#!/report":
+				document.getElementById('report-top-menu').classList.add('active');
+			break;
+					
+			}
+        } 	       
      </script>
 </head>
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <div class="navbar-header"><a class="navbar-brand" href="#">Camera Emporium</a></div>
+            <div class="navbar-header"><a class="navbar-brand" href="#">Naik Camera Emporium</a></div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="#!/sales">Sales</a></li>
-                    <li><a href="#!/repair">Repair</a></li>
-                    <li><a href="#!/report">Report</a></li>
-                    <li><a href="#!/view1">view1</a></li>
+                    <li class="top-menu active" id="sales-top-menu" ><a href="#!/sales">Sales</a></li>
+                    <li class="top-menu" id="repair-top-menu"><a href="#!/repair">Service</a></li>
+                    <li class="top-menu" id="report-top-menu"><a href="#!/report">Report</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                       <li style="margin-top:5px;"><button onclick="openInNewTab('index.html')" class="btn btn-success" type="submit">Start New Sale</button></li>

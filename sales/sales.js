@@ -24,7 +24,7 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
       },
       card:{
         amount:0,
-        bank:'',
+        bankName:'',
         cardNumber:'',
         expDate:'',
         cardNetwork:'',
@@ -32,9 +32,9 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
       },
       cheq:{
         amount:0,
-        bank:'',
-        chequeNo:'',
-        chequeDate:''
+        bankName:'',
+        cheqNo:'',
+        cheqDate:''
       }
     };
     
@@ -87,10 +87,7 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
             amount = parseFloat(amount,10);
             amount = amount.toFixed(decimalPosition);
             amount = parseFloat(amount,10);
-        }else{
-            debugger;    
         }
-        
         return amount;
     }
     
@@ -156,14 +153,21 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
     var salesAjaxCall = function(payload){
         $http({
             method : "POST",
-            url : 'fixture/sales.json?v='+(Math.random()),
+           // url : 'fixture/sales.json?v='+(Math.random()),
+            url : 'rest/invoice/sales?v='+(Math.random()),
             data : payload
         }).then(function mySuccess(response) {
             console.log(response.data);
             $scope.salesResponseData = response.data;
             console.log($scope.salesResponseData);
             console.log($scope.customerDetails);
-            $scope.open();
+            if ($scope.salesResponseData.status){
+            	$scope.open();
+            }else {
+            	alert("Error in Submission:Please contact Administrator")
+            }
+            
+            
         }, function myError(response) {
             //$scope.myWelcome = response.statusText;
         });        
@@ -177,7 +181,8 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
     $scope.customerList = function(val) {
         
         //return $http.get('http://10.20.116.112:8080/vogellaRestImpl/rest/customer/serach-customer',{
-        return $http.get('fixture/customer.json?text='+(Math.random()),{
+       // return $http.get('fixture/customer.json?text='+(Math.random()),{
+    	 return $http.get('rest/customer/serach-customer?v='+(Math.random()),{
           params: {
             text: val
           }
@@ -189,7 +194,10 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
     };
 
     $scope.productList = function(val, type) {
-        return $http.get('fixture/item-list.json?v='+Math.random(), {
+    	
+        //return $http.get('fixture/item-list.json?v='+Math.random(), {
+    	return $http.get('rest/product/search-product?v='+Math.random(), {
+        	
         //return $http.get('http://10.20.116.112:8080/vogellaRestImpl/rest/product/search-product',{
           params: {
             text: val,
@@ -210,11 +218,11 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
     }
 
     $scope.selectProductFrmList = function(value, type){
-        $scope.curentProduct.id = value.id || null;
+        $scope.curentProduct.id = value.id || "";
         $scope.curentProduct.name = value.name || '';
         $scope.curentProduct.model = value.model || '';
         $scope.curentProduct.sn = value.sn || '';
-        $scope.curentProduct.price = parseFloat(value.price, 10) || null;
+        $scope.curentProduct.price = parseFloat(value.price, 10) || 0;
         $scope.curentProduct.taxType = value.taxType || '';
         $scope.curentProduct.taxRate = parseFloat(value.taxRate, 10) || 0;
         $scope.curentProduct.quantity = 1;
@@ -224,6 +232,7 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
     $scope.performSalesOperation = function(){
         var payInfoPayLoad = angular.copy($scope.paymentInfo[$scope.paymentInfo.paymentType]);
             payInfoPayLoad.type = $scope.paymentInfo.paymentType;
+            $scope.dateValue = $scope.salesDate.toDateString();
         var payLoad = {
             paymentInfo:[payInfoPayLoad],
             customerInfo:angular.copy($scope.customerDetails),
@@ -236,6 +245,19 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
         setCurrentProductTax($scope.curentProduct.taxType);
     }
 
+    $scope.calculateProductCosting = function()	{
+    	$scope.curentProduct.quantity = parseInt($scope.curentProduct.quantity, 10);
+        if(!isNaN($scope.curentProduct.quantity) && !isNaN($scope.curentProduct.price)){
+        	$scope.curentProduct.grandTotal  = toDecimalPrecision($scope.curentProduct.quantity * $scope.curentProduct.price);
+        }
+        if(!isNaN($scope.curentProduct.grandTotal) && !isNaN($scope.curentProduct.taxValue)){
+            $scope.curentProduct.taxAmmount = toDecimalPrecision(($scope.curentProduct.grandTotal * $scope.curentProduct.taxValue)/100);
+        }
+        if(!isNaN($scope.curentProduct.taxAmmount)){
+        	$scope.curentProduct.totalPrice = toDecimalPrecision($scope.curentProduct.grandTotal - $scope.curentProduct.taxAmmount);
+        }
+    }
+    
     $scope.addProduct = function(){
         
         $scope.curentProduct.quantity = parseInt($scope.curentProduct.quantity, 10);
@@ -248,7 +270,16 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
         if(!isNaN($scope.curentProduct.taxAmmount)){
             $scope.curentProduct.grandTotal = toDecimalPrecision($scope.curentProduct.taxAmmount + $scope.curentProduct.totalPrice);
         }
+        $scope.calculateProductCosting();
         if($scope.isValidProductInfoforAdd()){
+        	if($scope.curentProduct && $scope.curentProduct.id === undefined){
+        		$scope.curentProduct.id="";
+        	}
+        	
+        	if($scope.curentProduct && $scope.curentProduct.taxRate === undefined){
+        		$scope.curentProduct.taxRate = $scope.curentProduct.taxValue;
+        	}
+        	
             $scope.selectedProducts.push($scope.curentProduct);  
             calculateTotal();
             $scope.taxTypeTotal = calculateTaxTypeTotal();
@@ -348,7 +379,8 @@ angular.module('salesApp.sales', ['ngRoute' , 'smart-table', 'ui.bootstrap'])
         modalInstance.result.then(function (selectedItem) {
           //$scope.selected = selectedItem;
         }, function (a,b,c) {
-          $log.info('Modal dismissed at: ' + new Date());
+        	$log.info('Modal dismissed at: ' + new Date());
+          	window.location.href="index.html";
         });
   };
     
